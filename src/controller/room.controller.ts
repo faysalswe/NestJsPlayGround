@@ -17,7 +17,9 @@ export class RoomController {
     }
   
     @Post()
-    async createNewTicket(@Body() newRoom: NewRoom): Promise<any> {
+    async createNewTicket(@Body() newRoom): Promise<any> {
+      console.log("updated room", newRoom);
+      
      return await this.roomService.add(newRoom);
     }
   

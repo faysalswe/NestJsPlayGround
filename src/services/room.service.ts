@@ -18,7 +18,7 @@ export class RoomService {
         return this.roomModel.findById(Types.ObjectId(id)).exec();
     }
 
-    async add(newRoom: NewRoom): Promise<any> {
+    async add(newRoom): Promise<any> {
         const createdCat = new this.roomModel(newRoom);
         return createdCat.save();
     }
