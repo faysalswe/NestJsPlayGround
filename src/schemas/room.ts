@@ -1,13 +1,13 @@
 
 import { Prop, Schema, SchemaFactory, raw } from '@nestjs/mongoose';
-import { Document, SchemaTypes } from 'mongoose';
+import { Document } from 'mongoose';
 
 @Schema()
 export class Room extends Document {
   
   @Prop(raw([{
-    email: { type: String },
-    fullName: { type: String },
+    userId: { type: String },
+    name: { type: String },
     point: { type: Number },
     isAdmin: { type: Boolean }
   }]))
@@ -16,9 +16,9 @@ export class Room extends Document {
   @Prop(raw([{
     title: { type: String },
     point: { type: Number },
-    users:[{
-      userId: { types: SchemaTypes.ObjectId },
-      point: { type: Number}
+    userCardPoints: [{ 
+      point: { type: Number},
+      userId: { type: String }
     }]
   }]))
   cards: Record<string, any>[];

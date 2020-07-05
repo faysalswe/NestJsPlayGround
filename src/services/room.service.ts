@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Room } from 'src/schemas/room';
-import { NewRoom } from 'src/dto/scrum-poker';
 
 @Injectable()
 export class RoomService {
@@ -24,7 +23,8 @@ export class RoomService {
     }
 
     async update(newRoom): Promise<any> {
-        return this.roomModel.updateOne({ title: newRoom.title }, newRoom).exec();
+        this.roomModel.updateOne({ _id: newRoom._id }, newRoom).exec();
+        return this.roomModel.findById(Types.ObjectId(newRoom._id)).exec();
     }
 
     async delete(id: number): Promise<any> {
