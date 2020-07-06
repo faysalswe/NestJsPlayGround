@@ -5,7 +5,7 @@ import { NewRoom } from 'src/dto/scrum-poker';
 @Controller('room')
 export class RoomController {
     clients = [];
-    data = {};
+    data = null;
     constructor(private readonly roomService: RoomService) {}
 
     @Get()
@@ -63,14 +63,17 @@ export class RoomController {
     }
   
     @Put()
-    async updateTicket(@Body() newRoom: NewRoom): Promise<any> {
-     return await this.roomService.update(newRoom);
+    async updateTicket(@Req() req, @Res() res): Promise<any> {
+      this.data = req.body;
+      this.data = await this.roomService.update(this.data);
+      // Send recently added nest as POST result
+      res.json(this.data)
+      // Invoke iterate and send function
+      return this.sendEventsToAll();
     }
   
     @Delete(':id')
     async deleteTicket(@Param('id') id: number): Promise<any> {
      return await this.roomService.delete(id);
     }
-
-
 }
