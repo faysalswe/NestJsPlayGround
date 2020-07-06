@@ -5,7 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { RoomSchema, Room } from './schemas/room';
 import { RoomService } from './services/room.service';
 import { RoomController } from './controller/room.controller';
-import { SseModule } from './sse/sse.module';
+import { SseController } from './controller/sse.controller';
 
 @Module({
   imports: [
@@ -13,9 +13,8 @@ import { SseModule } from './sse/sse.module';
     MongooseModule.forFeature([
       { name: Room.name, schema: RoomSchema }
     ]),
-    SseModule
   ],
-  controllers: [ AppController, RoomController ],
+  controllers: [ AppController, RoomController, SseController ],
   providers: [ RoomService ],
 })
 export class AppModule {}
