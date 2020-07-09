@@ -17,8 +17,9 @@ export class Room extends Document {
     title: { type: String },
     point: { type: Number },
     userCardPoints: [{ 
-      point: { type: Number},
-      userId: { type: String }
+      userId: { type: String },
+      name: { type: String },
+      point: { type: Number}
     }]
   }]))
   cards: Record<string, any>[];
