@@ -1,6 +1,5 @@
 import { Controller, Get, Param, Post, Body, Put, Delete, Res, Req } from '@nestjs/common';
 import { RoomService } from 'src/services/room.service';
-import { NewRoom } from 'src/dto/scrum-poker';
 
 @Controller('room')
 export class RoomController {
@@ -13,8 +12,8 @@ export class RoomController {
       return await this.roomService.gets();
     }
  
-    @Get('sse')
-    sseEvent(@Req() req, @Res() res): any {
+    @Get('sse/:id')
+    sseEvent(@Req() req, @Res() res,@Param() param: any): any {
       const headers = {
         'Content-Type': 'text/event-stream',
         'Connection': 'keep-alive',
@@ -25,31 +24,21 @@ export class RoomController {
       const data = `data: ${JSON.stringify(this.data)}\n\n`;
       res.write(data);
 
-      const clientId = Date.now();
-      const newClient = {
-        id: clientId,
-        res
-      };
-      this.clients.push(newClient);
-
+      const index = this.clients.findIndex(x => x.id == param.id);
+      if (index >= 0) {
+        this.clients[index].res = res;
+      } else {        
+        this.clients.push({ id: param.id, res});
+      }
       req.on('close', () => {
-        console.log(`${clientId} Connection closed`);
-        this.clients = this.clients.filter(c => c.id !== clientId);
+        console.log(`total client: ${this.clients.length} and ${param.id} Connection closed`);
+        this.clients = this.clients.filter(c => c.id !== param.id);
       });
     }
 
     sendEventsToAll() {
       const data = `data: ${JSON.stringify(this.data)}\n\n`;
       this.clients.forEach(c => c.res.write(data));
-    }
-
-    @Post('invoke')
-    invoke(@Req() req, @Res() res): any {
-      this.data = req.body;
-      // Send recently added nest as POST result
-      res.json(this.data)
-      // Invoke iterate and send function
-      return this.sendEventsToAll();
     }
 
     @Get(':id')
@@ -66,9 +55,7 @@ export class RoomController {
     async updateTicket(@Req() req, @Res() res): Promise<any> {
       this.data = req.body;
       this.data = await this.roomService.update(this.data);
-      // Send recently added nest as POST result
       res.json(this.data)
-      // Invoke iterate and send function
       return this.sendEventsToAll();
     }
   
