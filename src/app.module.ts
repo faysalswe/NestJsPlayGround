@@ -8,7 +8,7 @@ import { RoomController } from './controller/room.controller';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://localhost/nest'),
+    MongooseModule.forRoot(process.env.DB_CON_STRING),
     MongooseModule.forFeature([
       { name: Room.name, schema: RoomSchema }
     ]),
@@ -16,4 +16,8 @@ import { RoomController } from './controller/room.controller';
   controllers: [ AppController, RoomController ],
   providers: [ RoomService ],
 })
-export class AppModule {}
+export class AppModule {
+  constructor() {
+    console.log(process.env.DB_CON_STRING);
+  }
+}
