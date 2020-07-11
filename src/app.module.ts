@@ -5,7 +5,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { RoomSchema, Room } from './schemas/room';
 import { RoomService } from './services/room.service';
 import { RoomController } from './controller/room.controller';
-import { SseController } from './controller/sse.controller';
 
 @Module({
   imports: [
@@ -14,7 +13,7 @@ import { SseController } from './controller/sse.controller';
       { name: Room.name, schema: RoomSchema }
     ]),
   ],
-  controllers: [ AppController, RoomController, SseController ],
+  controllers: [ AppController, RoomController ],
   providers: [ RoomService ],
 })
 export class AppModule {}
