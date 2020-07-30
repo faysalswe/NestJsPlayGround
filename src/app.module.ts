@@ -18,6 +18,5 @@ import { RoomController } from './controller/room.controller';
 })
 export class AppModule {
   constructor() {
-    console.log(process.env.DB_CON_STRING);
   }
 }

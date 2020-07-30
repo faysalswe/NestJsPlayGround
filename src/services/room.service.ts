@@ -23,7 +23,7 @@ export class RoomService {
     }
 
     async update(newRoom): Promise<any> {
-        this.roomModel.updateOne({ _id: newRoom._id }, newRoom).exec();
+        await this.roomModel.updateOne({ _id: newRoom._id }, newRoom).exec();
         return this.roomModel.findById(Types.ObjectId(newRoom._id)).exec();
     }
 
