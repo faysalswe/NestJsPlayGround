@@ -4,7 +4,7 @@ import { RoomService } from 'src/services/room.service';
 @Controller('room')
 export class RoomController {
   clients = [];
-  data = null;
+  data = {};
   constructor(private readonly roomService: RoomService) {}
 
   @Get()
@@ -12,7 +12,7 @@ export class RoomController {
     return await this.roomService.gets();
   }
  
-  @Get('sse/:id')
+  @Get('sse/:roomId/:userId')
   sseEvent(@Req() req, @Res() res,@Param() param: any): any {
     const headers = {
       'Content-Type': 'text/event-stream',
@@ -20,25 +20,29 @@ export class RoomController {
       'Cache-Control': 'no-cache'
     };
     res.writeHead(200, headers);
-
-    const data = `data: ${JSON.stringify(this.data)}\n\n`;
+    console.log(this.data, "data");
+    const data = `data: ${JSON.stringify(this.data[param.roomId])}\n\n`;
     res.write(data);
-
-    const index = this.clients.findIndex(x => x.id == param.id);
+    
+    const index = this.clients.findIndex(x => x.userId == param.userId);
     if (index >= 0) {
       this.clients[index].res = res;
     } else {        
-      this.clients.push({ id: param.id, res});
+      this.clients.unshift({ userId: param.userId, roomId: param.roomId, res});
     }
     req.on('close', () => {
-      console.log(`total client: ${this.clients.length} and ${param.id} Connection closed`);
-      this.clients = this.clients.filter(c => c.id !== param.id);
+      console.log(`total client: ${this.clients.length} and ${param.userId} Connection closed`);
+      this.clients = this.clients.filter(c => c.userId !== param.userId);
     });
   }
 
-  sendEventsToAll() {
-    const data = `data: ${JSON.stringify(this.data)}\n\n`;
-    this.clients.forEach(c => c.res.write(data));
+  sendEventsToAll(roomId) {
+    const data = `data: ${JSON.stringify(this.data[roomId])}\n\n`;
+    this.clients.forEach(c => {
+      if (roomId == c.roomId) {
+        c.res.write(data);
+      }
+    });
   }
 
   @Get(':id')
@@ -53,9 +57,10 @@ export class RoomController {
 
   @Put()
   async updateTicket(@Req() req, @Res() res): Promise<any> {
-    this.data = await this.roomService.update(req.body);
-    res.json(this.data);
-    return this.sendEventsToAll();
+    const entity = await this.roomService.update(req.body);
+    this.data[entity._id] = entity;
+    res.json(entity);
+    return this.sendEventsToAll(entity._id);
   }
 
   @Delete(':id')
